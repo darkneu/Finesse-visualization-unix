@@ -1,10 +1,281 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Finesse3 Optics Simulator</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* ============================================================
+   i18n — English / 简体中文
+   Language is stored in localStorage('optics_lang').
+   Static text uses data-i18n / data-i18n-title attributes;
+   dynamic strings call t('key') or t('key', {n: value}).
+   ============================================================ */
+window.I18N = {
+  en: {
+    "app.title": "Optics Simulator",
+    "btn.run": "Run", "btn.sweep": "Sweep", "btn.clear": "Clear",
+    "btn.example": "Example", "btn.save": "Save", "btn.undo": "Undo",
+    "btn.tools": "Tools", "btn.layers": "Layers", "btn.vars": "Vars",
+    "btn.preamble": "Preamble", "btn.box": "Box", "btn.lockAll": "Lock All",
+    "btn.unlockAll": "Unlock All", "btn.advanced": "+ Advanced",
+    "btn.import": "Import", "btn.copy": "Copy", "btn.exportKat": "Export .kat",
+    "btn.exportIpynb": "Export .ipynb", "btn.exportCsv": "Export CSV",
+    "btn.jupyter": "Jupyter", "btn.addParam": "+ Add Param",
+    "btn.addVariable": "+ Add Variable", "btn.addCell": "+  Add Cell",
+    "btn.delete": "Delete", "btn.cancel": "Cancel", "btn.ok": "OK",
+    "btn.insert": "Insert", "btn.propagate": "Propagate",
+    "btn.duplicate": "Duplicate", "btn.flipH": "Flip H", "btn.flipV": "Flip V",
+    "btn.showCcd": "Show CCD Image", "btn.showCcdAnim": "Show CCD Animation",
+    "btn.extraParam": "+ Extra param", "btn.runAll": "▸ Run All",
+    "btn.trace": "🔍 Trace", "btn.mismatch": "📊 Mismatch",
+    "btn.refresh": "↻ Refresh", "btn.insertParam": "+ Insert Param",
+    "btn.close": "Close",
+    "label.components": "Components", "label.properties": "Properties",
+    "label.import": "Import", "label.panels": "PANELS",
+    "label.layers": "LAYERS", "label.variables": "VARIABLES",
+    "label.preamble": "PREAMBLE", "label.advanced": "Advanced",
+    "label.tools": "Tools", "label.parameterSweep": "Parameter Sweep",
+    "label.together": "Together", "label.separate": "Separate",
+    "label.len": "Len", "label.realPhi": "Real φ", "label.legend": "Legend ▸",
+    "label.name": "Name", "label.length": "Length (L)", "label.katType": "Kat Type",
+    "label.rotate": "Rotate", "label.from": "From:", "label.to": "To:",
+    "label.comp": "Comp", "label.param": "Param", "label.port": "Port",
+    "label.dataVars": "Data variables (click to insert)",
+    "label.noData": "No data", "label.runSweepFirst": "Run a sweep first",
+    "label.outputPlaceholder": "Output will appear here...",
+    "label.katPlaceholder": "Click \"Run\" to see KatScript here",
+    "label.katImportPlaceholder": "Paste KatScript here...",
+    "label.beamPropagate": "Beam Propagate", "label.insertParameter": "Insert Parameter",
+    "label.linear": "Linear", "label.log": "Log",
+    "label.undefinedVars": "Undefined Variables",
+    "label.enterVarValues": "Enter values for the following variables:",
+    "label.value": "value",
+    "label.clickComponent": "Click a component<br>to edit its parameters",
+    "status.ready": "Ready", "status.running": "Running...",
+    "status.done": "Done", "status.error": "Error", "status.cleared": "Cleared",
+    "status.undone": "Undone", "status.nothingToUndo": "Nothing to undo",
+    "status.sweeping": "Sweeping...", "status.sweepDone": "Sweep done",
+    "status.connected": "Connected", "status.dragDone": "Drag done",
+    "status.clickTargetPort": "Click target port to connect",
+    "status.boxModeOn": "Box mode: click & drag on canvas",
+    "status.boxModeOff": "Box mode off",
+    "status.constraintReady": "Constraint solver ready",
+    "status.addComponentsFirst": "Add components first",
+    "status.needTwoComponents": "Need at least 2 visible components",
+    "status.propagateDone": "Propagate done",
+    "status.lockedAll": "Locked all", "status.unlockedAll": "Unlocked all",
+    "status.separateMax2": "Separate mode supports max 2 params",
+    "status.configureSweep": "Configure at least one sweep param",
+    "status.noModelLoaded": "No model loaded",
+    "status.needTwoComps": "Need >=2 components",
+    "status.runningIn": "Running In[{n}]...", "status.inDone": "In[{n}] done",
+    "status.step": "Step: {cur} / {total}",
+    "status.doneCcd": "Done ({n} CCDs)",
+    "status.saved": "Saved: {name} ({file})",
+    "status.saveFailed": "Save failed: {err}",
+    "status.loaded": "Loaded: {name}",
+    "status.renamed": "Renamed: {old} -> {new}",
+    "status.nameInUse": "Name \"{name}\" already in use",
+    "status.added": "Added {type}",
+    "status.autoBackup": "Auto-backup #{n}",
+    "status.synced": "Synced (preserved {n} steering mirrors)",
+    "status.propagateError": "Propagate error: {err}",
+    "status.errorMsg": "Error: {err}",
+    "status.popupBlocked": "Popup blocked! Allow popups for this site.",
+    "status.nothingToCopy": "Nothing to copy",
+    "status.katCopied": "KatScript copied",
+    "status.nothingToExport": "Nothing to export",
+    "status.exportedKat": "Exported model.kat",
+    "status.exportedIpynb": "Exported model.ipynb",
+    "status.noCcdData": "No CCD data. Run simulation first.",
+    "status.noCcdIntensity": "No CCD intensity data",
+    "status.noKatToImport": "No KatScript to import",
+    "status.imported": "Imported {n} components",
+    "status.restored": "Restored {n} components",
+    "status.posParseError": "POS parse error",
+    "status.tutorialLoaded": "Tutorial loaded (all locked)",
+    "status.iconAssigned": "Icon assigned to {key}",
+    "status.loadedSvg": "Loaded SVG: {type}",
+    "status.noSvg": "No SVG for: {type}",
+    "confirm.deleteExample": "Delete example?",
+    "confirm.deleteComponent": "Delete this component?",
+    "confirm.clearAll": "Clear the whole canvas?",
+    "menu.duplicate": "Duplicate", "menu.delete": "Delete",
+    "menu.pos": "Pos", "menu.icon": "Icon",
+    "ccd.frames": "{n} frames", "ccd.loop": "Loop",
+    "comp.laser": "Laser", "comp.mirror": "Mirror", "comp.beamsplitter": "Beamsplitter",
+    "comp.lens": "Lens", "comp.modulator": "EOM", "comp.isolator": "Isolator",
+    "comp.photodetector": "Photodetector", "comp.ccd": "CCD", "comp.gauss": "Gauss",
+    "comp.cavity": "Cavity", "comp.ad": "Amplitude Detector", "comp.custom": "Custom",
+    "comp.tem": "TEM Mode", "comp.amplDet": "Ampl. Det.",
+    "title.tools": "Tools", "title.lightDark": "Light/Dark mode",
+    "title.decreaseFont": "Decrease font size", "title.increaseFont": "Increase font size",
+    "title.decreaseGrid": "Decrease grid size", "title.increaseGrid": "Increase grid size",
+    "title.realConvention": "Real convention when checked",
+    "title.drawBox": "Draw annotation box",
+    "title.toggleLocks": "Toggle all connection locks (length+angle)",
+    "title.advancedComponents": "Advanced components",
+    "title.openJupyter": "Open Jupyter in new window",
+    "title.exportNotebook": "Export as Jupyter notebook",
+    "title.beamPropagate": "Beam propagate", "title.delete": "Delete",
+    "title.language": "Switch language / 切换语言",
+    "prompt.assignType": "Assign to which type?"
+  },
+  zh: {
+    "app.title": "光学仿真器",
+    "btn.run": "运行", "btn.sweep": "扫描", "btn.clear": "清空",
+    "btn.example": "示例", "btn.save": "保存", "btn.undo": "撤销",
+    "btn.tools": "工具", "btn.layers": "图层", "btn.vars": "变量",
+    "btn.preamble": "前导", "btn.box": "标注框", "btn.lockAll": "全部锁定",
+    "btn.unlockAll": "全部解锁", "btn.advanced": "+ 高级",
+    "btn.import": "导入", "btn.copy": "复制", "btn.exportKat": "导出 .kat",
+    "btn.exportIpynb": "导出 .ipynb", "btn.exportCsv": "导出 CSV",
+    "btn.jupyter": "Jupyter", "btn.addParam": "+ 添加参数",
+    "btn.addVariable": "+ 添加变量", "btn.addCell": "+  添加单元格",
+    "btn.delete": "删除", "btn.cancel": "取消", "btn.ok": "确定",
+    "btn.insert": "插入", "btn.propagate": "传播",
+    "btn.duplicate": "复制", "btn.flipH": "水平翻转", "btn.flipV": "垂直翻转",
+    "btn.showCcd": "显示 CCD 图像", "btn.showCcdAnim": "显示 CCD 动画",
+    "btn.extraParam": "+ 额外参数", "btn.runAll": "▸ 全部运行",
+    "btn.trace": "🔍 追踪", "btn.mismatch": "📊 失配",
+    "btn.refresh": "↻ 刷新", "btn.insertParam": "+ 插入参数",
+    "btn.close": "关闭",
+    "label.components": "元件", "label.properties": "属性",
+    "label.import": "导入", "label.panels": "面板",
+    "label.layers": "图层", "label.variables": "变量",
+    "label.preamble": "前导代码", "label.advanced": "高级",
+    "label.tools": "工具", "label.parameterSweep": "参数扫描",
+    "label.together": "同时", "label.separate": "分别",
+    "label.len": "长度", "label.realPhi": "实相位", "label.legend": "图例 ▸",
+    "label.name": "名称", "label.length": "长度 (L)", "label.katType": "Kat 类型",
+    "label.rotate": "旋转", "label.from": "起点：", "label.to": "终点：",
+    "label.comp": "元件", "label.param": "参数", "label.port": "端口",
+    "label.dataVars": "数据变量（点击插入）",
+    "label.noData": "无数据", "label.runSweepFirst": "请先运行一次扫描",
+    "label.outputPlaceholder": "输出将显示在这里...",
+    "label.katPlaceholder": "点击“运行”查看 KatScript",
+    "label.katImportPlaceholder": "在此粘贴 KatScript...",
+    "label.beamPropagate": "光束传播", "label.insertParameter": "插入参数",
+    "label.linear": "线性", "label.log": "对数",
+    "label.undefinedVars": "未定义变量",
+    "label.enterVarValues": "请输入以下变量的值：",
+    "label.value": "值",
+    "label.clickComponent": "点击元件<br>以编辑其参数",
+    "status.ready": "就绪", "status.running": "运行中...",
+    "status.done": "完成", "status.error": "错误", "status.cleared": "已清空",
+    "status.undone": "已撤销", "status.nothingToUndo": "没有可撤销的操作",
+    "status.sweeping": "扫描中...", "status.sweepDone": "扫描完成",
+    "status.connected": "已连接", "status.dragDone": "拖动完成",
+    "status.clickTargetPort": "点击目标端口以连接",
+    "status.boxModeOn": "标注框模式：在画布上点击并拖动",
+    "status.boxModeOff": "标注框模式已关闭",
+    "status.constraintReady": "约束求解器就绪",
+    "status.addComponentsFirst": "请先添加元件",
+    "status.needTwoComponents": "至少需要 2 个可见元件",
+    "status.propagateDone": "传播完成",
+    "status.lockedAll": "已全部锁定", "status.unlockedAll": "已全部解锁",
+    "status.separateMax2": "分别模式最多支持 2 个参数",
+    "status.configureSweep": "请至少配置一个扫描参数",
+    "status.noModelLoaded": "未加载模型",
+    "status.needTwoComps": "至少需要 2 个元件",
+    "status.runningIn": "正在运行 In[{n}]...", "status.inDone": "In[{n}] 完成",
+    "status.step": "步进：{cur} / {total}",
+    "status.doneCcd": "完成（{n} 个 CCD）",
+    "status.saved": "已保存：{name} ({file})",
+    "status.saveFailed": "保存失败：{err}",
+    "status.loaded": "已加载：{name}",
+    "status.renamed": "已重命名：{old} -> {new}",
+    "status.nameInUse": "名称“{name}”已被占用",
+    "status.added": "已添加 {type}",
+    "status.autoBackup": "自动备份 #{n}",
+    "status.synced": "已同步（保留 {n} 个转向镜）",
+    "status.propagateError": "传播错误：{err}",
+    "status.errorMsg": "错误：{err}",
+    "status.popupBlocked": "弹窗被拦截！请允许本站弹窗。",
+    "status.nothingToCopy": "没有可复制的内容",
+    "status.katCopied": "KatScript 已复制",
+    "status.nothingToExport": "没有可导出的内容",
+    "status.exportedKat": "已导出 model.kat",
+    "status.exportedIpynb": "已导出 model.ipynb",
+    "status.noCcdData": "无 CCD 数据，请先运行仿真。",
+    "status.noCcdIntensity": "无 CCD 强度数据",
+    "status.noKatToImport": "没有可导入的 KatScript",
+    "status.imported": "已导入 {n} 个元件",
+    "status.restored": "已恢复 {n} 个元件",
+    "status.posParseError": "POS 解析错误",
+    "status.tutorialLoaded": "教程已加载（全部锁定）",
+    "status.iconAssigned": "图标已分配给 {key}",
+    "status.loadedSvg": "已加载 SVG：{type}",
+    "status.noSvg": "无 SVG：{type}",
+    "confirm.deleteExample": "删除该示例？",
+    "confirm.deleteComponent": "删除该元件？",
+    "confirm.clearAll": "清空整个画布？",
+    "menu.duplicate": "复制", "menu.delete": "删除",
+    "menu.pos": "位置", "menu.icon": "图标",
+    "ccd.frames": "{n} 帧", "ccd.loop": "循环",
+    "comp.laser": "激光器", "comp.mirror": "反射镜", "comp.beamsplitter": "分束器",
+    "comp.lens": "透镜", "comp.modulator": "电光调制器", "comp.isolator": "隔离器",
+    "comp.photodetector": "光电探测器", "comp.ccd": "CCD", "comp.gauss": "高斯光束",
+    "comp.cavity": "光学腔", "comp.ad": "振幅探测器", "comp.custom": "自定义",
+    "comp.tem": "TEM 模式", "comp.amplDet": "振幅探测",
+    "title.tools": "工具", "title.lightDark": "浅色/深色模式",
+    "title.decreaseFont": "减小字号", "title.increaseFont": "增大字号",
+    "title.decreaseGrid": "减小网格", "title.increaseGrid": "增大网格",
+    "title.realConvention": "勾选时使用实相位约定",
+    "title.drawBox": "绘制标注框",
+    "title.toggleLocks": "切换所有连接锁定（长度+角度）",
+    "title.advancedComponents": "高级元件",
+    "title.openJupyter": "在新窗口打开 Jupyter",
+    "title.exportNotebook": "导出为 Jupyter notebook",
+    "title.beamPropagate": "光束传播", "title.delete": "删除",
+    "title.language": "Switch language / 切换语言",
+    "prompt.assignType": "分配给哪种类型？"
+  }
+};
+
+window._lang = (function(){
+  try { return localStorage.getItem('optics_lang') || 'en'; } catch(e){ return 'en'; }
+})();
+
+window.t = function(key, params){
+  var dict = window.I18N[window._lang] || window.I18N.en;
+  var s = (key in dict) ? dict[key] : (window.I18N.en[key] !== undefined ? window.I18N.en[key] : key);
+  if(params){
+    for(var k in params){ s = s.split('{'+k+'}').join(params[k]); }
+  }
+  return s;
+};
+
+/* Apply translations to all elements carrying data-i18n / data-i18n-title. */
+window.applyI18n = function(){
+  document.documentElement.lang = (window._lang === 'zh') ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.innerHTML = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){
+    el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  var lbl = document.getElementById('lang-label');
+  if(lbl) lbl.textContent = (window._lang === 'zh') ? '中' : 'EN';
+};
+
+window.toggleLang = function(){
+  window._lang = (window._lang === 'zh') ? 'en' : 'zh';
+  try { localStorage.setItem('optics_lang', window._lang); } catch(e){}
+  window.applyI18n();
+  if(typeof renderLib === 'function') renderLib();
+  if(typeof renderLayers === 'function') renderLayers();
+  if(typeof renderVars === 'function') renderVars();
+  if(typeof renderPreamble === 'function') renderPreamble();
+  if(typeof updateSweepMode === 'function') updateSweepMode();
+  if(typeof setStatus === 'function') setStatus(t('status.ready'));
+};
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -133,111 +404,112 @@ button.accent:hover{filter:brightness(1.15)}
 <body>
 
 <header id="main-header">
-  <h1>Optics Simulator</h1>
-  <button class="accent" onclick="run()">Run</button>
-  <button onclick="toggleSweepPanel()">Sweep</button>
-  <button onclick="clearAll()">Clear</button>
-  <button id="btn-example" onclick="toggleExamplePanel()" style="font-size:11px">Example</button>
-  <button onclick="saveExample()" style="font-size:11px">Save</button>
-  <button onclick="undo()" style="font-size:11px">Undo</button>
-  <button id="tools-btn" onclick="var btn=this,m=document.getElementById('tools-menu'),r=btn.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=r.bottom+'px';m.style.display=m.style.display==='none'?'block':'none';if(m.style.display==='block'){var cls=function(e){if(!m.contains(e.target)&&e.target!==btn){m.style.display='none';document.removeEventListener('mousedown',cls);}};setTimeout(function(){document.addEventListener('mousedown',cls);},10);}" style="font-size:11px;padding:3px 8px;display:none" title="Tools">&#9776; Tools</button>
+  <h1 data-i18n="app.title">Optics Simulator</h1>
+  <button class="accent" onclick="run()" data-i18n="btn.run">Run</button>
+  <button onclick="toggleSweepPanel()" data-i18n="btn.sweep">Sweep</button>
+  <button onclick="clearAll()" data-i18n="btn.clear">Clear</button>
+  <button id="btn-example" onclick="toggleExamplePanel()" style="font-size:11px" data-i18n="btn.example">Example</button>
+  <button onclick="saveExample()" style="font-size:11px" data-i18n="btn.save">Save</button>
+  <button onclick="undo()" style="font-size:11px" data-i18n="btn.undo">Undo</button>
+  <button id="tools-btn" onclick="var btn=this,m=document.getElementById('tools-menu'),r=btn.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=r.bottom+'px';m.style.display=m.style.display==='none'?'block':'none';if(m.style.display==='block'){var cls=function(e){if(!m.contains(e.target)&&e.target!==btn){m.style.display='none';document.removeEventListener('mousedown',cls);}};setTimeout(function(){document.addEventListener('mousedown',cls);},10);}" style="font-size:11px;padding:3px 8px;display:none" title="Tools" data-i18n-title="title.tools">&#9776; <span data-i18n="btn.tools">Tools</span></button>
   <div id="tools-menu" style="display:none;position:fixed;background:var(--bg);border:1px solid var(--border);border-radius:8px;z-index:99999;min-width:140px;padding:6px 0;box-shadow:0 6px 20px rgba(0,0,0,0.3)">
-    <div style="padding:4px 12px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600">Tools</div>
-    <button onclick="dumpPositions();document.getElementById('tools-menu').style.display='none'" style="display:block;width:100%;text-align:left;padding:7px 12px;font-size:12px;background:none;border:none;border-radius:0;cursor:pointer">Pos</button>
-    <button onclick="openIconPanel();document.getElementById('tools-menu').style.display='none'" style="display:block;width:100%;text-align:left;padding:7px 12px;font-size:12px;background:none;border:none;border-radius:0;cursor:pointer">Icon</button>
+    <div style="padding:4px 12px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600" data-i18n="label.tools">Tools</div>
+    <button onclick="dumpPositions();document.getElementById('tools-menu').style.display='none'" style="display:block;width:100%;text-align:left;padding:7px 12px;font-size:12px;background:none;border:none;border-radius:0;cursor:pointer" data-i18n="menu.pos">Pos</button>
+    <button onclick="openIconPanel();document.getElementById('tools-menu').style.display='none'" style="display:block;width:100%;text-align:left;padding:7px 12px;font-size:12px;background:none;border:none;border-radius:0;cursor:pointer" data-i18n="menu.icon">Icon</button>
   </div>
   <div id="example-panel" style="display:none;position:fixed;background:var(--card);border:1px solid var(--border);border-radius:8px;z-index:99999;min-width:220px;padding:8px 0;box-shadow:0 6px 20px rgba(0,0,0,0.3)"></div>
   <div id="sweep-panel" style="display:none;position:fixed;background:var(--card);border:1px solid var(--border);border-radius:8px;z-index:99999;min-width:320px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,0.3)">
-    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px">Parameter Sweep</div>
+    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px" data-i18n="label.parameterSweep">Parameter Sweep</div>
     <div id="sweep-rows"></div>
     <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center">
-      <button onclick="addSweepRow()" style="font-size:10px;padding:2px 8px">+ Add Param</button>
+      <button onclick="addSweepRow()" style="font-size:10px;padding:2px 8px" data-i18n="btn.addParam">+ Add Param</button>
       <span id="sweep-mode-area" style="font-size:9px;color:var(--muted);display:flex;align-items:center;gap:4px">
-        <label><input type="radio" name="sweep-mode" value="together" checked onchange="updateSweepMode()"> Together</label>
-        <label><input type="radio" name="sweep-mode" value="separate" onchange="updateSweepMode()"> Separate</label>
+        <label><input type="radio" name="sweep-mode" value="together" checked onchange="updateSweepMode()"> <span data-i18n="label.together">Together</span></label>
+        <label><input type="radio" name="sweep-mode" value="separate" onchange="updateSweepMode()"> <span data-i18n="label.separate">Separate</span></label>
       </span>
-      <button onclick="clearSweepRows()" style="font-size:10px;padding:2px 8px;margin-left:auto">Clear</button>
+      <button onclick="clearSweepRows()" style="font-size:10px;padding:2px 8px;margin-left:auto" data-i18n="btn.clear">Clear</button>
     </div>
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px;justify-content:flex-end">
-      <button onclick="sweep()" class="accent" style="font-size:11px;padding:6px 20px">Run</button>
+      <button onclick="sweep()" class="accent" style="font-size:11px;padding:6px 20px" data-i18n="btn.run">Run</button>
     </div>
   </div>
-  <button onclick="document.querySelector('.layer-panel').classList.toggle('open');renderLayers()" style="font-size:11px">Layers</button>
-  <button onclick="document.querySelector('.vars-panel').classList.toggle('open');renderVars()" style="font-size:11px">Vars</button>
-  <button onclick="document.querySelector('.preamble-panel').classList.toggle('open');renderPreamble()" style="font-size:11px">Preamble</button>
-  <button onclick="startBoxMode()" id="btn-box" style="font-size:11px" title="Draw annotation box">Box</button>
-  <button id="lock-all-btn" onclick="toggleAllLocks()" style="font-size:11px" title="Toggle all connection locks (length+angle)">Lock All</button>
+  <button onclick="document.querySelector('.layer-panel').classList.toggle('open');renderLayers()" style="font-size:11px" data-i18n="btn.layers">Layers</button>
+  <button onclick="document.querySelector('.vars-panel').classList.toggle('open');renderVars()" style="font-size:11px" data-i18n="btn.vars">Vars</button>
+  <button onclick="document.querySelector('.preamble-panel').classList.toggle('open');renderPreamble()" style="font-size:11px" data-i18n="btn.preamble">Preamble</button>
+  <button onclick="startBoxMode()" id="btn-box" style="font-size:11px" title="Draw annotation box" data-i18n="btn.box" data-i18n-title="title.drawBox">Box</button>
+  <button id="lock-all-btn" onclick="toggleAllLocks()" style="font-size:11px" title="Toggle all connection locks (length+angle)" data-i18n="btn.lockAll" data-i18n-title="title.toggleLocks">Lock All</button>
   <span style="color:var(--muted);font-size:10px;margin:0 0 0 12px">│</span>
   <span style="font-size:10px;display:flex;align-items:center;gap:3px;margin:0 4px">
-    <span style="color:var(--muted)">Len</span>
+    <span style="color:var(--muted)" data-i18n="label.len">Len</span>
     <canvas id="color-bar" width="80" height="10" style="border-radius:2px;vertical-align:middle"></canvas>
     <span id="color-bar-label" style="color:var(--muted);font-size:9px;min-width:50px;display:inline-block"></span>
   </span>
   <span style="color:var(--muted);font-size:10px;margin:0 0 0 8px">│</span>
   <span style="display:flex;align-items:center;gap:3px;margin:0 4px">
-    <button onclick="changeFontSize(-1)" style="font-size:10px;padding:2px 6px" title="Decrease font size">A−</button>
-    <button onclick="changeFontSize(1)" style="font-size:10px;padding:2px 6px" title="Increase font size">A+</button>
+    <button onclick="changeFontSize(-1)" style="font-size:10px;padding:2px 6px" title="Decrease font size" data-i18n-title="title.decreaseFont">A−</button>
+    <button onclick="changeFontSize(1)" style="font-size:10px;padding:2px 6px" title="Increase font size" data-i18n-title="title.increaseFont">A+</button>
     <span id="font-size-label" style="color:var(--muted);font-size:9px;min-width:22px;display:inline-block;text-align:center">13</span>
     <span style="color:var(--muted);margin:0 2px">|</span>
-    <button onclick="changeGridSize(-1)" style="font-size:10px;padding:2px 6px" title="Decrease grid size">G−</button>
-    <button onclick="changeGridSize(1)" style="font-size:10px;padding:2px 6px" title="Increase grid size">G+</button>
+    <button onclick="changeGridSize(-1)" style="font-size:10px;padding:2px 6px" title="Decrease grid size" data-i18n-title="title.decreaseGrid">G−</button>
+    <button onclick="changeGridSize(1)" style="font-size:10px;padding:2px 6px" title="Increase grid size" data-i18n-title="title.increaseGrid">G+</button>
     <span id="grid-size-label" style="color:var(--muted);font-size:9px;min-width:22px;display:inline-block;text-align:center">40</span>
   </span>
   <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px;cursor:pointer">
-    <input type="checkbox" checked onchange="window._imagTrans = this.checked" style="width:auto" title="Real convention when checked">
-    Real φ
+    <input type="checkbox" checked onchange="window._imagTrans = this.checked" style="width:auto" title="Real convention when checked" data-i18n-title="title.realConvention">
+    <span data-i18n="label.realPhi">Real φ</span>
   </label>
-  <span class="status" id="status">Ready</span>
+  <span class="status" id="status" data-i18n="status.ready">Ready</span>
   <span id="sweep-step" style="display:none;font-size:11px;color:var(--accent);margin-left:8px;min-width:80px;text-align:right"></span>
-  <button onclick="toggleTheme()" style="font-size:10px;padding:3px 8px" title="Light/Dark mode">🌓</button>
+  <button onclick="toggleLang()" style="font-size:10px;padding:3px 8px" title="Switch language / 切换语言" data-i18n-title="title.language"><span id="lang-label">EN</span></button>
+  <button onclick="toggleTheme()" style="font-size:10px;padding:3px 8px" title="Light/Dark mode" data-i18n-title="title.lightDark">🌓</button>
 </header>
 
 <div class="main">
   <div class="lib">
     <div class="lib-resize" id="lib-resize"></div>
-    <div class="lib-header" onclick="this.classList.toggle('collapsed')"><h3>Components</h3></div>
+    <div class="lib-header" onclick="this.classList.toggle('collapsed')"><h3 data-i18n="label.components">Components</h3></div>
     <div class="lib-list" id="lib-list"></div>
     <div style="margin:6px 8px">
-      <button onclick="var btn=this,m=document.getElementById('adv-menu2'),r=btn.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=r.bottom+'px';m.style.display=m.style.display==='none'?'block':'none';if(m.style.display==='block'){var cls=function(e){if(!m.contains(e.target)&&e.target!==btn){m.style.display='none';document.removeEventListener('mousedown',cls);}};setTimeout(function(){document.addEventListener('mousedown',cls);},10);}" style="font-size:11px;width:100%;padding:4px 0" title="Advanced components">+ Advanced</button>
+      <button onclick="var btn=this,m=document.getElementById('adv-menu2'),r=btn.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=r.bottom+'px';m.style.display=m.style.display==='none'?'block':'none';if(m.style.display==='block'){var cls=function(e){if(!m.contains(e.target)&&e.target!==btn){m.style.display='none';document.removeEventListener('mousedown',cls);}};setTimeout(function(){document.addEventListener('mousedown',cls);},10);}" style="font-size:11px;width:100%;padding:4px 0" title="Advanced components" data-i18n="btn.advanced" data-i18n-title="title.advancedComponents">+ Advanced</button>
     </div>
     <div id="adv-menu2" style="display:none;position:fixed;background:var(--bg);border:1px solid var(--border);border-radius:8px;z-index:99999;min-width:160px;padding:8px 0;box-shadow:0 6px 20px rgba(0,0,0,0.3)">
-      <div style="padding:4px 14px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600">Advanced</div>
+      <div style="padding:4px 14px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600" data-i18n="label.advanced">Advanced</div>
       <div class="lib-item" draggable="true" data-type="gauss" data-name="Gauss" data-kat="gauss"
            data-width="30" data-height="30" data-color="#7f8c8d"
            data-params='{"w0":0.001,"z":0}' data-ports='[{"name":"p1","dir":"both"}]'
            ondragstart="onDragStart(event)" style="display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:grab">
         <div class="lib-icon" style="width:24px;height:24px;background:#7f8c8d;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">G</div>
-        <div><div class="lib-name" style="font-size:12px">Gauss</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">gauss</div></div>
+        <div><div class="lib-name" style="font-size:12px" data-i18n="comp.gauss">Gauss</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">gauss</div></div>
       </div>
       <div class="lib-item" draggable="true" data-type="cavity" data-name="Cavity" data-kat="cav"
            data-width="30" data-height="20" data-color="#7f8c8d"
            data-params='{"node":""}' data-ports='[{"name":"p1","dir":"both"}]'
            ondragstart="onDragStart(event)" style="display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:grab">
         <div class="lib-icon" style="width:24px;height:24px;background:#7f8c8d;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">C</div>
-        <div><div class="lib-name" style="font-size:12px">Cavity</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">cav</div></div>
+        <div><div class="lib-name" style="font-size:12px" data-i18n="comp.cavity">Cavity</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">cav</div></div>
       </div>
       <div class="lib-item" draggable="true" data-type="tem" data-name="TEM Mode" data-kat="tem"
            data-width="30" data-height="20" data-color="#7f8c8d"
            data-params='{"n":0,"m":0,"amp":1,"phase":0}' data-ports='[]'
            ondragstart="onDragStart(event)" style="display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:grab">
         <div class="lib-icon" style="width:24px;height:24px;background:#7f8c8d;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">T</div>
-        <div><div class="lib-name" style="font-size:12px">TEM Mode</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">tem</div></div>
+        <div><div class="lib-name" style="font-size:12px" data-i18n="comp.tem">TEM Mode</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">tem</div></div>
       </div>
       <div class="lib-item" draggable="true" data-type="ad" data-name="Amplitude Detector" data-kat="ad"
            data-width="30" data-height="35" data-color="#34495e"
            data-params='{"f":0,"n":0,"m":0}' data-ports='[{"name":"p1","dir":"in"}]'
            ondragstart="onDragStart(event)" style="display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:grab">
         <div class="lib-icon" style="width:24px;height:24px;background:#34495e;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">A</div>
-        <div><div class="lib-name" style="font-size:12px">Ampl. Det.</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">ad</div></div>
+        <div><div class="lib-name" style="font-size:12px" data-i18n="comp.ad">Amplitude Detector</div><div class="lib-kat" style="font-size:10px;color:var(--muted)">ad</div></div>
       </div>
     </div>
     <div style="border-top:1px solid var(--border);padding:8px">
-      <h3 style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Import</h3>
-      <textarea id="kat-import" placeholder="Paste KatScript here..."
+      <h3 style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px" data-i18n="label.import">Import</h3>
+      <textarea id="kat-import" placeholder="Paste KatScript here..." data-i18n-ph="label.katImportPlaceholder"
         style="width:100%;height:120px;background:var(--bg);border:1px solid var(--border);color:#2ecc71;font-family:Consolas,monospace;font-size:10px;padding:6px;border-radius:3px;resize:vertical"></textarea>
       <div style="display:flex;gap:4px;margin-top:4px">
-        <button onclick="importFull()" style="flex:1;font-size:11px;padding:4px 0">Import</button>
-        <button onclick="document.getElementById('kat-import').value=''" style="flex:1;font-size:11px;padding:4px 0">Clear</button>
+        <button onclick="importFull()" style="flex:1;font-size:11px;padding:4px 0" data-i18n="btn.import">Import</button>
+        <button onclick="document.getElementById('kat-import').value=''" style="flex:1;font-size:11px;padding:4px 0" data-i18n="btn.clear">Clear</button>
       </div>
     </div>
   </div>
@@ -254,11 +526,11 @@ button.accent:hover{filter:brightness(1.15)}
   </div>
 
   <div class="props">
-    <div class="props-header" onclick="this.classList.toggle('collapsed')"><h3>Properties</h3></div>
+    <div class="props-header" onclick="this.classList.toggle('collapsed')"><h3 data-i18n="label.properties">Properties</h3></div>
     <div class="props-body" id="props-content">
       <div class="empty-state">
         <svg width="40" height="40" viewBox="0 0 40 40"><rect x="10" y="10" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="14" y1="20" x2="26" y2="20" stroke="currentColor" stroke-width="1"/></svg>
-        <div>Click a component<br>to edit its parameters</div>
+        <div data-i18n="label.clickComponent">Click a component<br>to edit its parameters</div>
       </div>
     </div>
     <div class="props-body" style="border-top:1px solid var(--border)"></div>
@@ -268,47 +540,47 @@ button.accent:hover{filter:brightness(1.15)}
 <div class="output" id="output-section">
   <div class="resize-handle" id="resize-handle"></div>
   <div style="padding:4px 12px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;background:var(--card)">
-    <span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:8px">PANELS</span>
-    <button onclick="window.open('/jupyter','_blank','width=1000,height=700')" style="font-size:9px;padding:3px 10px" title="Open Jupyter in new window">Jupyter</button>
+    <span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:8px" data-i18n="label.panels">PANELS</span>
+    <button onclick="window.open('/jupyter','_blank','width=1000,height=700')" style="font-size:9px;padding:3px 10px" title="Open Jupyter in new window" data-i18n="btn.jupyter" data-i18n-title="title.openJupyter">Jupyter</button>
     <span style="flex:1"></span>
-  <button onclick="copyKatScript()" style="font-size:9px;padding:3px 8px">Copy</button>
-  <button onclick="exportKatScript()" style="font-size:9px;padding:3px 8px">Export .kat</button>
-  <button onclick="exportPython()" style="font-size:9px;padding:3px 8px" title="Export as Jupyter notebook">Export .ipynb</button>
+  <button onclick="copyKatScript()" style="font-size:9px;padding:3px 8px" data-i18n="btn.copy">Copy</button>
+  <button onclick="exportKatScript()" style="font-size:9px;padding:3px 8px" data-i18n="btn.exportKat">Export .kat</button>
+  <button onclick="exportPython()" style="font-size:9px;padding:3px 8px" title="Export as Jupyter notebook" data-i18n="btn.exportIpynb" data-i18n-title="title.exportNotebook">Export .ipynb</button>
   </div>
   <div id="tab-panel-kat" style="display:flex;flex:1;min-height:0">
-    <div id="output-code-wrap"><div class="output-code"><div class="code-resize-handle" id="code-resize-handle"></div><pre id="katscript-output">Click "Run" to see KatScript here</pre></div></div>
+    <div id="output-code-wrap"><div class="output-code"><div class="code-resize-handle" id="code-resize-handle"></div><pre id="katscript-output" data-i18n="label.katPlaceholder">Click "Run" to see KatScript here</pre></div></div>
     <div id="output-chart-wrap" style="flex:1;display:flex;flex-direction:column;position:relative;min-height:200px">
       <div class="output-chart" style="display:flex;flex-direction:column;flex:1;position:relative">
         <canvas id="chart" style="width:100%!important;height:100%!important"></canvas>
         <canvas id="chart-phase" style="width:100%!important;height:100%!important;display:none"></canvas>
       </div>
       <div id="legend-overlay" style="position:absolute;top:8px;right:8px;z-index:10;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:0;font-size:11px;max-width:200px">
-        <div id="legend-header" onclick="var el=document.getElementById('legend-body');el.style.display=el.style.display==='none'?'':'none'" style="cursor:pointer;padding:6px 10px;color:var(--accent);user-select:none">Legend ▸</div>
+        <div id="legend-header" onclick="var el=document.getElementById('legend-body');el.style.display=el.style.display==='none'?'':'none'" style="cursor:pointer;padding:6px 10px;color:var(--accent);user-select:none" data-i18n="label.legend">Legend ▸</div>
         <div id="legend-body" style="display:none;padding:4px 8px 8px;max-height:200px;overflow-y:auto"></div>
       </div>
       <div id="pd-filters" style="display:none;flex-wrap:wrap;gap:4px;padding:2px 12px;align-items:center"></div>
       <div style="display:flex;gap:6px;padding:4px 12px;align-items:center">
         <span style="font-size:10px;color:var(--muted);margin-left:8px">X:</span>
         <select id="axis-x-scale" onchange="replotChart()" style="font-size:10px;padding:2px 4px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px">
-          <option value="linear">Linear</option>
-          <option value="logarithmic">Log</option>
+          <option value="linear" data-i18n="label.linear">Linear</option>
+          <option value="logarithmic" data-i18n="label.log">Log</option>
         </select>
         <span style="font-size:10px;color:var(--muted);margin-left:4px">Y:</span>
         <select id="axis-y-scale" onchange="replotChart()" style="font-size:10px;padding:2px 4px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px">
-          <option value="linear">Linear</option>
-          <option value="logarithmic">Log</option>
+          <option value="linear" data-i18n="label.linear">Linear</option>
+          <option value="logarithmic" data-i18n="label.log">Log</option>
         </select>
-        <button onclick="exportSweepData()" style="font-size:10px;padding:3px 8px;margin-left:auto">Export CSV</button>
+        <button onclick="exportSweepData()" style="font-size:10px;padding:3px 8px;margin-left:auto" data-i18n="btn.exportCsv">Export CSV</button>
       </div>
     </div>
   </div>
   <div id="tab-panel-jupyter" style="display:none;flex:1;min-height:0">
     <div style="display:flex;flex-direction:column;width:50%;border-right:1px solid var(--border);padding:8px">
       <div style="display:flex;gap:6px;margin-bottom:6px">
-        <button onclick="runJupyter()" class="accent" style="font-size:10px;padding:3px 10px">Run</button>
-        <button onclick="document.getElementById('jupyter-code').value=''" style="font-size:10px;padding:3px 10px">Clear</button>
-        <button onclick="openPropagateDialog()" style="font-size:10px;padding:3px 8px" title="Beam propagate">📡</button>
-        <span style="font-size:9px;color:var(--muted);margin-left:auto" id="jupyter-status">Ready</span>
+        <button onclick="runJupyter()" class="accent" style="font-size:10px;padding:3px 10px" data-i18n="btn.run">Run</button>
+        <button onclick="document.getElementById('jupyter-code').value=''" style="font-size:10px;padding:3px 10px" data-i18n="btn.clear">Clear</button>
+        <button onclick="openPropagateDialog()" style="font-size:10px;padding:3px 8px" title="Beam propagate" data-i18n-title="title.beamPropagate">📡</button>
+        <span style="font-size:9px;color:var(--muted);margin-left:auto" id="jupyter-status" data-i18n="status.ready">Ready</span>
       </div>
       <textarea id="jupyter-code" placeholder="# Available: model, finesse, np
 # Try: model.beam_trace()
@@ -318,9 +590,9 @@ print(y[:5])"
         style="flex:1;background:var(--bg);border:1px solid var(--border);color:#2ecc71;font-family:Consolas,monospace;font-size:11px;padding:8px;border-radius:4px;resize:none;min-height:150px"></textarea>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;padding:4px">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:4px" id="data-vars-label">Data variables (click to insert)</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px" id="data-vars-label" data-i18n="label.dataVars">Data variables (click to insert)</div>
       <div id="jupyter-vars" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">
-        <span style="font-size:10px;color:var(--muted)">Run a sweep first</span>
+        <span style="font-size:10px;color:var(--muted)" data-i18n="label.runSweepFirst">Run a sweep first</span>
       </div>
       <div style="flex:1;position:relative;min-height:100px">
         <canvas id="jupyter-chart" style="width:100%!important;height:100%!important;min-height:100px"></canvas>
@@ -330,24 +602,24 @@ print(y[:5])"
 </div>
 
 <div class="ctx-menu" id="context-menu">
-  <div onclick="duplicateSelected()">Duplicate</div>
-  <div class="danger" onclick="deleteSelected()">Delete</div>
+  <div onclick="duplicateSelected()" data-i18n="menu.duplicate">Duplicate</div>
+  <div class="danger" onclick="deleteSelected()" data-i18n="menu.delete">Delete</div>
 </div>
 
 <div class="layer-panel open" id="layer-panel">
-  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none">LAYERS</div>
+  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none" data-i18n="label.layers">LAYERS</div>
   <div id="layer-list"></div>
 </div>
 
 <div class="vars-panel" id="vars-panel">
-  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none">VARIABLES</div>
-  <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600">VARIABLES</div>
+  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none" data-i18n="label.variables">VARIABLES</div>
+  <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600" data-i18n="label.variables">VARIABLES</div>
   <div id="vars-list"></div>
-  <button onclick="globalVars.push({name:'var'+(globalVars.length+1),value:1});renderVars()" style="width:100%;font-size:10px;padding:4px 0;margin-top:6px;border:1px dashed var(--border);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer" id="add-var-btn">+ Add Variable</button>
+  <button onclick="globalVars.push({name:'var'+(globalVars.length+1),value:1});renderVars()" style="width:100%;font-size:10px;padding:4px 0;margin-top:6px;border:1px dashed var(--border);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer" id="add-var-btn" data-i18n="btn.addVariable">+ Add Variable</button>
 </div>
 
 <div class="preamble-panel" id="preamble-panel">
-  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none">PREAMBLE</div>
+  <div class="panel-drag" style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;padding:2px;user-select:none" data-i18n="label.preamble">PREAMBLE</div>
   <div id="preamble-list" style="font-size:10px"></div>
   <div style="display:flex;gap:4px;margin-top:6px">
     <input id="preamble-input" type="text" placeholder="modes(maxtem=10)" style="flex:1;padding:4px 6px;font-size:10px;font-family:Consolas,monospace;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px">
@@ -501,7 +773,7 @@ let _modCount = 0;
 function checkAutoBackup(){
   _modCount++;
   if(_modCount % 20 === 0){
-    setStatus('Auto-backup #'+(_modCount/20));
+    setStatus(t('status.autoBackup')+' #'+(_modCount/20));
     fetch('/api/backup', {method:'POST'});
   }
 }
@@ -510,14 +782,14 @@ function updateLockButtons(){
   var btn = document.getElementById('lock-all-btn');
   if(!btn) return;
   var allLocked = connections.length > 0 && connections.every(function(c){ return c.fixed && c.angleLocked; });
-  btn.textContent = allLocked ? 'Unlock All' : 'Lock All';
+  btn.textContent = allLocked ? t('btn.unlockAll') : t('btn.lockAll');
 }
 function toggleAllLocks(){
   var allLocked = connections.length > 0 && connections.every(function(c){ return c.fixed && c.angleLocked; });
   connections.forEach(function(c){ c.fixed = !allLocked; c.angleLocked = !allLocked; });
   updateLockButtons();
   render();
-  setStatus(allLocked ? 'Unlocked all' : 'Locked all');
+  setStatus(allLocked ? t('status.unlockedAll') : t('status.lockedAll'));
 }
 let compScale = 1.0;     // component size multiplier
 
@@ -557,11 +829,12 @@ async function initGCS(){
     gcsModule = mod;
     gcsWrapperClass = GcsWrapper;
     gcsReady = true;
-    setStatus('Constraint solver ready');
+    setStatus(t('status.constraintReady'));
   }catch(e){
     console.error('Failed to init GCS:', e);
   }
 }
+applyI18n();
 initGCS();
 
 function isSteeringMirror(bs){
@@ -643,7 +916,7 @@ function doSync(){
   phase2_5();
   window._phase3CB = null;
   render();
-  setStatus('Synced (preserved '+Object.keys(saved).length+' steering mirrors)');
+  setStatus(t('status.synced', {n: Object.keys(saved).length}));
 }
 
 // ============ Example save/load ============
@@ -659,25 +932,25 @@ function toggleExamplePanel(){
   if(p.style.display==='block'){p.style.display='none';return;}
   var r=btn.getBoundingClientRect();
   p.style.left=r.left+'px';p.style.top=r.bottom+'px';
-  p.innerHTML='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">Loading...</div>';
+  p.innerHTML='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">'+t('status.loading')+'</div>';
   p.style.display='block';
 
   fetch('/api/examples').then(function(resp){return resp.json();}).then(function(ex){
-    var h='<div style="padding:4px 12px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600">Examples</div>';
+    var h='<div style="padding:4px 12px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:600">'+t('label.examples')+'</div>';
     if(!ex||ex.length===0){
-      h+='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">No saved examples</div>';
+      h+='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">'+t('label.noExamples')+'</div>';
     }else{
       for(var i=0;i<ex.length;i++){
         (function(ei,en,efn){
           h+='<div style="display:flex;align-items:center;padding:6px 12px;gap:6px">';
-          h+='<span onclick="loadServerExample(\''+efn+'\')" style="flex:1;cursor:pointer;font-size:12px;padding:2px 0">'+(en||'Unnamed')+'</span>';
-          h+='<span onclick="deleteServerExample(\''+efn+'\')" style="cursor:pointer;color:#e74c3c;font-size:14px;font-weight:bold;padding:0 2px" title="Delete">&times;</span>';
+          h+='<span onclick="loadServerExample(\''+efn+'\')" style="flex:1;cursor:pointer;font-size:12px;padding:2px 0">'+(en||t('label.unnamed'))+'</span>';
+          h+='<span onclick="deleteServerExample(\''+efn+'\')" style="cursor:pointer;color:#e74c3c;font-size:14px;font-weight:bold;padding:0 2px" title="'+t('menu.delete')+'">&times;</span>';
           h+='</div>';
         })(i,ex[i].name,ex[i].filename);
       }
     }
     p.innerHTML=h;
-  }).catch(function(){p.innerHTML='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">Failed to load examples</div>';});
+  }).catch(function(){p.innerHTML='<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">'+t('status.loadFailed')+'</div>';});
 
   function cls(e){if(!p.contains(e.target)&&e.target!==btn){p.style.display='none';document.removeEventListener('mousedown',cls);}}
   setTimeout(function(){document.addEventListener('mousedown',cls);},10);
@@ -693,17 +966,17 @@ function loadServerExample(filename){
       components=found.data.components; connections=found.data.connections||[]; katLines=found.data.katLines||[]; globalVars=found.data.vars||[]; katPreamble=found.data.preamble||[];
       render();
     }
-    setStatus('Loaded: '+found.name);
+    setStatus(t('status.loaded')+': '+found.name);
   });
 }
 
 function deleteServerExample(filename){
-  if(!confirm('Delete example?')) return;
+  if(!confirm(t('confirm.deleteExample'))) return;
   fetch('/api/examples/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:filename})})
     .then(function(){toggleExamplePanel();});
 }
 function saveExample(){
-  var name=prompt('Example name:');
+  var name=prompt(t('prompt.exampleName'));
   if(!name||!name.trim())return;
   var data={
     name:name.trim(),
@@ -711,8 +984,8 @@ function saveExample(){
     timestamp:Date.now()
   };
   fetch('/api/examples',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
-    .then(function(r){return r.json()}).then(function(d){if(d.ok){setStatus('Saved: '+name.trim()+' ('+d.file+')');}else{setStatus('Save failed: '+d.error);}})
-    .catch(function(e){setStatus('Save failed: '+e.message);});
+    .then(function(r){return r.json()}).then(function(d){if(d.ok){setStatus(t('status.saved')+': '+name.trim()+' ('+d.file+')');}else{setStatus(t('status.saveFailed')+': '+d.error);}})
+    .catch(function(e){setStatus(t('status.saveFailed')+': '+e.message);});
 }
 
 function pushUndo(){
@@ -723,14 +996,14 @@ function pushUndo(){
 }
 
 function undo(){
-  if(undoStack.length === 0){ setStatus('Nothing to undo'); return; }
+  if(undoStack.length === 0){ setStatus(t('status.nothingToUndo')); return; }
   const state = JSON.parse(undoStack.pop());
   components = state.components;
   connections = state.connections;
   selected = null; selectedConn = null; multiSelected = [];
   if(chart){ chart.destroy(); chart = null; }
   render();
-  setStatus('Undone');
+  setStatus(t('status.undone'));
   dlog('[UNDO pop] comps='+components.length);
 }
 
@@ -794,7 +1067,7 @@ function renderLibrary(comps){
          ondragstart="onDragStart(event)">
       <div class="lib-icon" style="background:${c.color}">${c.kat}</div>
       <div>
-        <div class="lib-name">${c.type}</div>
+        <div class="lib-name">${t('comp.'+c.type)}</div>
         <div class="lib-kat">${c.kat}</div>
       </div>
     </div>
@@ -845,24 +1118,24 @@ function onDrop(e){
   };
   // Special handling: tem is a model-level command, not a visual component
   if(data.type === 'tem'){
-    var laserId = prompt('Laser ID (e.g. L0):', 'L0');
+    var laserId = prompt(t('prompt.laserId'), 'L0');
     if(!laserId){ return; }
-    var n = prompt('n (mode order):', '0');
+    var n = prompt(t('prompt.modeN'), '0');
     if(n === null) return;
-    var m = prompt('m (mode order):', '0');
+    var m = prompt(t('prompt.modeM'), '0');
     if(m === null) return;
-    var amp = prompt('Amplitude:', '1');
+    var amp = prompt(t('prompt.amplitude'), '1');
     if(amp === null) return;
-    var phase = prompt('Phase (degrees):', '0');
+    var phase = prompt(t('prompt.phaseDeg'), '0');
     if(phase === null) return;
     var temLine = 'tem(' + laserId + ', ' + n + ', ' + m + ', ' + amp + ', ' + phase + ')';
     katPreamble.push(temLine);
-    setStatus('Added: ' + temLine);
+    setStatus(t('status.added')+': ' + temLine);
     return;
   }
   // Special handling: custom component — prompt for port count
   if(data.type === 'custom'){
-    var portCount = parseInt(prompt('Number of ports:', '2'));
+    var portCount = parseInt(prompt(t('prompt.numPorts'), '2'));
     if(isNaN(portCount) || portCount < 1){ return; }
     comp.ports = [];
     for(var pi=1; pi<=portCount; pi++){
@@ -874,7 +1147,7 @@ function onDrop(e){
   selected = comp.id;
   selectedConn = null;
   render();
-  setStatus('Added ' + data.type);
+  setStatus(t('status.added')+' ' + t('comp.'+data.type));
 }
 
 // Resolve connection length to a numeric value, accounting for variable references
@@ -1309,7 +1582,7 @@ function renderProperties(){
     const srcPorts = src ? src.ports.map(p => p.name) : [conn.fromPort];
     const tgtPorts = tgt ? tgt.ports.map(p => p.name) : [conn.toPort];
     area.innerHTML = `
-      <div style="font-size:12px;margin-bottom:14px;color:var(--accent);font-weight:600">Connection</div>
+      <div style="font-size:12px;margin-bottom:14px;color:var(--accent);font-weight:600">${t('label.connection')}</div>
       <div style="display:flex;gap:6px;margin-bottom:12px;align-items:center">
         <span style="color:var(--text);font-size:11px">${conn.from}.</span>
         <select onchange="updateConnPort(${selectedConn},'fromPort',this.value)" style="flex:1;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:11px;border-radius:3px">
@@ -1322,21 +1595,21 @@ function renderProperties(){
         </select>
       </div>
       <div class="prop-group">
-        <label>Name</label>
+        <label>${t('label.name')}</label>
         <input type="text" value="${conn.name || conn.from + '-' + conn.to}" onchange="updateConnName(${selectedConn},this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px">
       </div>
       <div class="prop-group">
-        <label>Length (L)</label>
-        <input type="text" value="${flen}" onchange="updateConnLenExpr(${selectedConn},this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:${typeof flen==='string'?varColor(flen):'var(--text)'};border-radius:4px;font-size:13px;font-family:Consolas,monospace" placeholder="number or variable name">
+        <label>${t('label.length')}</label>
+        <input type="text" value="${flen}" onchange="updateConnLenExpr(${selectedConn},this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:${typeof flen==='string'?varColor(flen):'var(--text)'};border-radius:4px;font-size:13px;font-family:Consolas,monospace" placeholder="${t('label.numberOrVar')}">
       </div>
       ${conn.params ? Object.keys(conn.params).map(function(pk){ return `
       <div class="prop-group">
         <label>${pk}</label>
         <input type="text" value="${conn.params[pk]}" onchange="updateConnParam(${selectedConn},'${pk}',this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px;font-family:Consolas,monospace">
       </div>`; }).join('') : ''}
-      <button onclick="addExtraParam(${selectedConn})" style="width:100%;font-size:11px;padding:4px 0;margin-top:4px">+ Extra param</button>
+      <button onclick="addExtraParam(${selectedConn})" style="width:100%;font-size:11px;padding:4px 0;margin-top:4px">${t('btn.extraParam')}</button>
       <div style="margin-top:8px">
-        <button onclick="deleteConn(${selectedConn})" style="background:var(--accent);border-color:var(--accent);color:#fff;font-size:11px;padding:4px 12px">Delete</button>
+        <button onclick="deleteConn(${selectedConn})" style="background:var(--accent);border-color:var(--accent);color:#fff;font-size:11px;padding:4px 12px">${t('menu.delete')}</button>
       </div>
     `;
     return;
@@ -1347,16 +1620,16 @@ function renderProperties(){
     const b = boxes.find(x => x.id === selectedBox);
     if(!b) return;
     area.innerHTML = `
-      <div style="font-size:12px;margin-bottom:10px;color:var(--accent);font-weight:600">Box: ${b.name}</div>
+      <div style="font-size:12px;margin-bottom:10px;color:var(--accent);font-weight:600">${t('label.box')}: ${b.name}</div>
       <div class="prop-group">
-        <label>Name</label>
+        <label>${t('label.name')}</label>
         <input type="text" value="${b.name}" oninput="updateBoxName('${b.id}', this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px">
       </div>
       <div style="margin-top:8px;font-size:10px;color:var(--muted)">
         x:${b.x.toFixed(0)} y:${b.y.toFixed(0)} ${b.w.toFixed(0)}×${b.h.toFixed(0)}
       </div>
       <div style="margin-top:8px">
-        <button onclick="deleteBox('${b.id}')" style="background:var(--accent);border-color:var(--accent);color:#fff;font-size:11px;padding:4px 12px">Delete</button>
+        <button onclick="deleteBox('${b.id}')" style="background:var(--accent);border-color:var(--accent);color:#fff;font-size:11px;padding:4px 12px">${t('menu.delete')}</button>
       </div>
     `;
     return;
@@ -1366,7 +1639,7 @@ function renderProperties(){
   if(!selected){
     area.innerHTML = `<div class="empty-state">
       <svg width="40" height="40" viewBox="0 0 40 40"><rect x="10" y="10" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="14" y1="20" x2="26" y2="20" stroke="currentColor" stroke-width="1"/></svg>
-      <div>Click a component<br>or connection line</div>
+      <div>${t('label.clickComponentOrConn')}</div>
     </div>`;
     return;
   }
@@ -1386,14 +1659,14 @@ function renderProperties(){
   const advKeys = allParamKeys.filter(function(k){ return advancedSet.has(k) && (c.params[k] === undefined || c.params[k] === null || c.params[k] === ''); });
 
   area.innerHTML = `
-    <div style="font-size:12px;margin-bottom:10px;color:var(--accent);font-weight:600">${c.type}</div>
+    <div style="font-size:12px;margin-bottom:10px;color:var(--accent);font-weight:600">${t('comp.'+c.type)}</div>
     <div class="prop-group">
-      <label>Name</label>
+      <label>${t('label.name')}</label>
       <input type="text" value="${compName}" onchange="updateName('${c.id}',this.value)" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px">
     </div>
     ${c.type === 'custom' ? `
     <div class="prop-group">
-      <label>Kat Type</label>
+      <label>${t('label.katType')}</label>
       <input type="text" value="${c.kat || ''}" onchange="updateCustomKat('${c.id}',this.value)" placeholder="e.g. m, bs, dbs" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px;font-family:Consolas,monospace">
     </div>` : ''}
     ${basicKeys.length === 0 ? '' : basicKeys.map(k => {
@@ -1418,29 +1691,29 @@ function renderProperties(){
         <label>${k}</label>
         <input type="${isNum ? 'number' : 'text'}" step="any" value="${displayVal}" oninput="${isNum ? `updateParam('${c.id}','${k}',this.value)` : `updateParamExpr('${c.id}','${k}',this.value)`}" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);color:${expr ? '#3498db' : (isNum ? 'var(--text)' : varColor(v))};border-radius:4px;font-size:13px;font-family:Consolas,monospace">
       </div>`}).join('')}
-    <button onclick="addCompExtraParam('${c.id}')" style="font-size:11px;padding:4px 0;width:100%;margin-top:4px">+ Extra param</button>
+    <button onclick="addCompExtraParam('${c.id}')" style="font-size:11px;padding:4px 0;width:100%;margin-top:4px">${t('btn.extraParam')}</button>
     </div>` : ''}
-    ${c.type === 'custom' ? '<button onclick="addCompExtraParam(\''+c.id+'\')" style="font-size:11px;padding:4px 0;width:100%;margin-top:6px">+ Extra param</button>' : ''}
-    ${basicKeys.length === 0 && advKeys.length === 0 && c.type !== 'custom' ? '<div class="empty-state" style="padding:10px">No adjustable parameters</div>' : ''}
+    ${c.type === 'custom' ? '<button onclick="addCompExtraParam(\''+c.id+'\')" style="font-size:11px;padding:4px 0;width:100%;margin-top:6px">'+t('btn.extraParam')+'</button>' : ''}
+    ${basicKeys.length === 0 && advKeys.length === 0 && c.type !== 'custom' ? '<div class="empty-state" style="padding:10px">'+t('label.noParams')+'</div>' : ''}
     ${c.type === 'beamsplitter' ? `
     <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-      <button onclick="flipBS('${c.id}')" style="width:100%;font-size:11px;padding:4px 0">Flip H</button>
-      <button onclick="flipBS_p1p3('${c.id}')" style="width:100%;font-size:11px;padding:4px 0;margin-top:2px">Flip V</button>
+      <button onclick="flipBS('${c.id}')" style="width:100%;font-size:11px;padding:4px 0">${t('btn.flipH')}</button>
+      <button onclick="flipBS_p1p3('${c.id}')" style="width:100%;font-size:11px;padding:4px 0;margin-top:2px">${t('btn.flipV')}</button>
     </div>` : ''}
     ${c.type === 'mirror' ? `
     <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:4px">
-      <button onclick="flipMirrorH('${c.id}')" style="flex:1;font-size:11px;padding:4px 0">Flip H</button>
-      <button onclick="flipMirrorV('${c.id}')" style="flex:1;font-size:11px;padding:4px 0">Flip V</button>
+      <button onclick="flipMirrorH('${c.id}')" style="flex:1;font-size:11px;padding:4px 0">${t('btn.flipH')}</button>
+      <button onclick="flipMirrorV('${c.id}')" style="flex:1;font-size:11px;padding:4px 0">${t('btn.flipV')}</button>
     </div>` : ''}
-    ${c.type === 'ccd' ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><button onclick="showCCD(\'' + c.id + '\')" style="width:100%;font-size:11px;padding:5px 0;background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:4px">Show CCD Image</button><button onclick="showCCDAnim(\'' + c.id + '\')" style="width:100%;font-size:11px;padding:5px 0;margin-top:3px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px">Show CCD Animation</button></div>' : ''}
+    ${c.type === 'ccd' ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><button onclick="showCCD(\'' + c.id + '\')" style="width:100%;font-size:11px;padding:5px 0;background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:4px">'+t('btn.showCcd')+'</button><button onclick="showCCDAnim(\'' + c.id + '\')" style="width:100%;font-size:11px;padding:5px 0;margin-top:3px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px">'+t('btn.showCcdAnim')+'</button></div>' : ''}
     <div class="prop-group" style="margin-top:8px">
       <label style="display:flex;align-items:center;gap:6px">
         <input type="checkbox" ${c.fixedPos ? 'checked' : ''} onchange="toggleFixedPos('${c.id}',this.checked)" style="width:auto">
-        Fixed position
+        ${t('label.fixedPos')}
       </label>
     </div>
     <div class="prop-group" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-      <label>Rotate <span style="color:var(--accent);font-weight:600">${c.angle || 0}°</span></label>
+      <label>${t('label.rotate')} <span style="color:var(--accent);font-weight:600">${c.angle || 0}°</span></label>
       <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
         <button onclick="rotateComp('${c.id}',-90)" style="flex:1;font-size:11px;padding:3px 0">−90</button>
         <button onclick="rotateComp('${c.id}',-45)" style="flex:1;font-size:11px;padding:3px 0">−45</button>
@@ -1473,17 +1746,17 @@ function updateSweepComps(){
 
 function fillSweepCompSelect(sel){
   var prev = sel.value;
-  sel.innerHTML = '<option value="">Comp</option>';
-  components.forEach(function(c){ sel.innerHTML += '<option value="'+c.id+'"'+(c.id===prev?' selected':'')+'>'+c.id+' ('+c.type+')</option>'; });
+  sel.innerHTML = '<option value="">'+t('label.comp')+'</option>';
+  components.forEach(function(c){ sel.innerHTML += '<option value="'+c.id+'"'+(c.id===prev?' selected':'')+'>'+c.id+' ('+t('comp.'+c.type)+')</option>'; });
   // Add preamble-derived signals (sgen, fsig)
   for(var pi=0;pi<katPreamble.length;pi++){
     var pl = katPreamble[pi].trim();
-    if(pl.match(/^sgen\s+/)){ var sn=pl.split(/\s+/)[1]; sel.innerHTML += '<option value="preamble:'+sn+'"'+(prev==='preamble:'+sn?' selected':'')+'>'+sn+' (signal)</option>'; }
-    if(pl.startsWith('fsig(')){ sel.innerHTML += '<option value="preamble:fsig"'+(prev==='preamble:fsig'?' selected':'')+'>fsig (signal)</option>'; }
+    if(pl.match(/^sgen\s+/)){ var sn=pl.split(/\s+/)[1]; sel.innerHTML += '<option value="preamble:'+sn+'"'+(prev==='preamble:'+sn?' selected':'')+'>'+sn+' ('+t('label.signal')+')</option>'; }
+    if(pl.startsWith('fsig(')){ sel.innerHTML += '<option value="preamble:fsig"'+(prev==='preamble:fsig'?' selected':'')+'>fsig ('+t('label.signal')+')</option>'; }
   }
   if(globalVars.length > 0){
     var sel2 = (prev === 'var:' ? ' selected' : '');
-    sel.innerHTML += '<option value="var:"'+sel2+'>Variables</option>';
+    sel.innerHTML += '<option value="var:"'+sel2+'>'+t('label.variables')+'</option>';
   }
 }
 
@@ -1491,7 +1764,7 @@ function onSweepRowCompChange(sel){
   var row = sel.parentElement;
   var paramSel = row.querySelector('.sweep-param');
   var val = sel.value;
-  paramSel.innerHTML = '<option value="">Param</option>';
+  paramSel.innerHTML = '<option value="">'+t('label.param')+'</option>';
   if(!val) return;
   if(val === 'var:'){
     for(var vi=0;vi<globalVars.length;vi++){
@@ -1569,10 +1842,10 @@ function addSweepRow(){
   sweepRowCount++;
   var div = document.createElement('div');
   div.style.cssText = 'display:flex;gap:3px;margin-bottom:4px;align-items:center';
-  div.innerHTML = '<select class="sweep-comp" onchange="onSweepRowCompChange(this)" style="width:80px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px"><option value="">Comp</option></select>'+
-    '<select class="sweep-param" style="width:60px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px"><option value="">Param</option></select>'+
-    '<input class="sweep-start" type="number" value="0" step="any" style="width:50px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px" placeholder="Start">'+
-    '<input class="sweep-stop" type="number" value="1" step="any" style="width:50px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px" placeholder="Stop">'+
+  div.innerHTML = '<select class="sweep-comp" onchange="onSweepRowCompChange(this)" style="width:80px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px"><option value="">'+t('label.comp')+'</option></select>'+
+    '<select class="sweep-param" style="width:60px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px"><option value="">'+t('label.param')+'</option></select>'+
+    '<input class="sweep-start" type="number" value="0" step="any" style="width:50px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px" placeholder="'+t('label.start')+'">'+
+    '<input class="sweep-stop" type="number" value="1" step="any" style="width:50px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px" placeholder="'+t('label.stop')+'">'+
     '<input class="sweep-steps" type="number" value="100" min="2" style="width:45px;font-size:10px;padding:2px 3px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:3px" placeholder="N">'+
     (sweepRowCount > 1 ? '<button onclick="this.parentElement.remove();updateSweepMode()" style="font-size:9px;padding:1px 4px;color:var(--accent);background:transparent;border:none;cursor:pointer">x</button>' : '');
   rows.appendChild(div);
@@ -1586,7 +1859,7 @@ function updateSweepMode(){
   area.style.display = rows.length > 1 ? 'flex' : 'none';
   // For separate mode with >2 params, show warning
   if(rows.length > 2 && document.querySelector('input[name="sweep-mode"]:checked').value === 'separate'){
-    setStatus('Separate mode supports max 2 params for now');
+    setStatus(t('status.separateMax2'));
   }
 }
 
@@ -1654,7 +1927,7 @@ document.querySelector('#svg').addEventListener('mouseup', function(e){
   if(preview) preview.remove();
   boxDrawing = null;
   if(w < 5 || h < 5){ boxMode = false; render(); return; }
-  const name = prompt('Box name:','Group ' + (boxes.length + 1));
+  const name = prompt(t('prompt.boxName'), t('label.group')+' ' + (boxes.length + 1));
   if(!name){ boxMode = false; render(); return; }
   boxes.push({id:'box'+(boxes.length+1), name, x, y, w, h});
   boxMode = false;
@@ -1674,7 +1947,7 @@ function startBoxMode(){
   boxMode = !boxMode;
   boxDrawing = null;
   document.getElementById('btn-box').style.background = boxMode ? 'var(--accent)' : '';
-  setStatus(boxMode ? 'Box mode: click & drag on canvas' : 'Box mode off');
+  setStatus(boxMode ? t('status.boxModeOn') : t('status.boxModeOff'));
 }
 
 function selectBox(id){
@@ -1832,7 +2105,7 @@ function startDrag(comp, e){
     document.removeEventListener("mousemove", move);
     document.removeEventListener("mouseup", up);
     render();
-    setStatus('Drag done');
+    setStatus(t('status.dragDone'));
   }
   document.addEventListener("mousemove", move);
   document.addEventListener("mouseup", up);
@@ -1841,7 +2114,7 @@ function startDrag(comp, e){
 function startLink(compId, portName){
   if(!linking){
     linking = {compId, portName};
-    setStatus('Click target port to connect');
+    setStatus(t('status.clickTargetPort'));
   } else if(linking.compId !== compId){
     const src = components.find(c => c.id === linking.compId);
     const tgt = components.find(c => c.id === compId);
@@ -1865,7 +2138,7 @@ function startLink(compId, portName){
       angle: ang,
       lengthExpr: null,
     });
-    setStatus('Connected');
+    setStatus(t('status.connected'));
     linking = null;
     render();
   }
@@ -2119,7 +2392,7 @@ function updateName(compId, value){
   if(!newName || newName === compId) return;
   // Check if new name already exists
   if(components.some(c => c.id === newName)){
-    setStatus('Name "' + newName + '" already in use');
+    setStatus(t('status.nameInUse', {name: newName}));
     render(); return;
   }
   const oldId = comp.id;
@@ -2131,7 +2404,7 @@ function updateName(compId, value){
   }
   if(selected === oldId) selected = newName;
   render();
-  setStatus('Renamed: ' + oldId + ' -> ' + newName);
+  setStatus(t('status.renamed', {old: oldId, new: newName}));
 }
 
 function updateConnLen(idx, value){
@@ -2209,9 +2482,9 @@ function updateConnParam(idx, key, value){
   render();
 }
 function addExtraParam(idx){
-  var key = prompt('Parameter name:', 'nr');
+  var key = prompt(t('prompt.paramName'), 'nr');
   if(!key) return;
-  var val = prompt('Value for "'+key+'":', '1.45');
+  var val = prompt(t('prompt.valueFor', {key: key}), '1.45');
   if(val === null) return;
   if(!connections[idx].params) connections[idx].params = {};
   connections[idx].params[key] = (val === '' || isNaN(parseFloat(val))) ? val : parseFloat(val);
@@ -2220,9 +2493,9 @@ function addExtraParam(idx){
 function addCompExtraParam(cid){
   var comp = components.find(function(c){ return c.id === cid; });
   if(!comp) return;
-  var key = prompt('Parameter name:', 'phi');
+  var key = prompt(t('prompt.paramName'), 'phi');
   if(!key) return;
-  var val = prompt('Value for "'+key+'":', '0');
+  var val = prompt(t('prompt.valueFor', {key: key}), '0');
   if(val === null) return;
   comp.params[key] = (val === '' || isNaN(parseFloat(val))) ? val : parseFloat(val);
   if(comp._usedParams.indexOf(key) < 0) comp._usedParams.push(key);
@@ -2231,13 +2504,13 @@ function addCompExtraParam(cid){
 
 function toggleConnFixed(idx, checked){
   connections[idx].fixed = checked;
-  setStatus('Conn ' + idx + ': length=' + (checked?'locked':'free') + ' angle=' + (connections[idx].angleLocked?'locked':'free'));
+  setStatus(t('status.connLock', {idx: idx, len: (checked?t('label.locked'):t('label.free')), ang: (connections[idx].angleLocked?t('label.locked'):t('label.free'))}));
   render();
 }
 
 function toggleConnAngleLock(idx, checked){
   connections[idx].angleLocked = checked;
-  setStatus('Conn ' + idx + ': length=' + (connections[idx].fixed?'locked':'free') + ' angle=' + (checked?'locked':'free'));
+  setStatus(t('status.connLock', {idx: idx, len: (connections[idx].fixed?t('label.locked'):t('label.free')), ang: (checked?t('label.locked'):t('label.free'))}));
   render();
 }
 
@@ -2280,11 +2553,11 @@ function ctxMenu(e){
   m.style.cssText = 'display:block;position:fixed;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px;z-index:9999;min-width:120px;box-shadow:0 8px 24px rgba(0,0,0,.4);left:'+e.clientX+'px;top:'+e.clientY+'px';
   
   if(selected){
-    m.innerHTML = '<div onclick="duplicateSelected();this.parentElement.remove()">Duplicate</div><div class="danger" onclick="deleteSelected();this.parentElement.remove()">Delete</div>';
+    m.innerHTML = '<div onclick="duplicateSelected();this.parentElement.remove()">'+t('menu.duplicate')+'</div><div class="danger" onclick="deleteSelected();this.parentElement.remove()">'+t('menu.delete')+'</div>';
   } else if(multiSelected.length > 0){
-    m.innerHTML = '<div onclick="hideMulti();this.parentElement.remove()">Hide (' + multiSelected.length + ')</div><div class="danger" onclick="deleteMulti();this.parentElement.remove()">Delete (' + multiSelected.length + ')</div>';
+    m.innerHTML = '<div onclick="hideMulti();this.parentElement.remove()">'+t('menu.hide')+' (' + multiSelected.length + ')</div><div class="danger" onclick="deleteMulti();this.parentElement.remove()">'+t('menu.delete')+' (' + multiSelected.length + ')</div>';
   } else {
-    m.innerHTML = '<div class="danger" onclick="deleteConn(selectedConn);this.parentElement.remove()">Delete connection</div>';
+    m.innerHTML = '<div class="danger" onclick="deleteConn(selectedConn);this.parentElement.remove()">'+t('menu.deleteConn')+'</div>';
   }
   
   document.body.appendChild(m);
@@ -2363,8 +2636,8 @@ function renderLayers(){
   if(!list) return;
   list.innerHTML = components.map(c => {
     const vis = !c.hidden;
-    return '<div class="layer-item"><span class="layer-eye ' + (vis?'':'off') + '" onclick="toggleHidden(\'' + c.id + '\')">' + (vis?'👁':'─') + '</span><span style="color:' + c.color + ';font-weight:600;flex:1" onclick="selectComponent(\'' + c.id + '\')">' + c.id + '</span><span style="color:var(--muted);margin-right:4px">' + c.type + '</span><button class="del" onclick="deleteComponent(\'' + c.id + '\')" style="font-size:10px;padding:1px 5px;background:transparent;border:none;color:var(--accent);cursor:pointer">×</button></div>';
-  }).join('') || '<div style="font-size:10px;color:var(--muted)">No components</div>';
+    return '<div class="layer-item"><span class="layer-eye ' + (vis?'':'off') + '" onclick="toggleHidden(\'' + c.id + '\')">' + (vis?'👁':'─') + '</span><span style="color:' + c.color + ';font-weight:600;flex:1" onclick="selectComponent(\'' + c.id + '\')">' + c.id + '</span><span style="color:var(--muted);margin-right:4px">' + t('comp.'+c.type) + '</span><button class="del" onclick="deleteComponent(\'' + c.id + '\')" style="font-size:10px;padding:1px 5px;background:transparent;border:none;color:var(--accent);cursor:pointer">×</button></div>';
+  }).join('') || '<div style="font-size:10px;color:var(--muted)">'+t('label.noComponents')+'</div>';
 }
 
 function renderVars(){
@@ -2377,7 +2650,7 @@ function renderVars(){
       '<input class="val" type="text" value="' + v.value + '" onchange="updateVarValue(' + i + ',this.value)" style="font-family:Consolas,monospace">' +
       '<button onclick="deleteVar(' + i + ')">×</button>' +
     '</div>'
-  ).join('') || '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">No variables defined</div>';
+  ).join('') || '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">'+t('label.noVars')+'</div>';
 }
 
 function updateVarName(idx, val){
@@ -2428,7 +2701,7 @@ function renderPreamble(){
     return '<div class="preamble-row"><span style="flex:1;cursor:pointer;'+(commented?'opacity:0.4;text-decoration:line-through':'')+'" onclick="editPreambleLine('+i+')">' + display + '</span>' +
       '<button class="del" onclick="togglePreambleComment('+i+')" style="font-size:9px;padding:1px 4px;background:transparent;border:none;color:'+(commented?'#2ecc71':'var(--muted)')+';cursor:pointer;border-radius:3px">#</button>' +
       '<button class="del" onclick="deletePreambleLine('+i+')">×</button></div>';
-  }).join('') || '<div style="color:var(--muted)">No preamble lines</div>';
+  }).join('') || '<div style="color:var(--muted)">'+t('label.noPreamble')+'</div>';
 }
 
 function togglePreambleComment(idx){
@@ -2439,7 +2712,7 @@ function togglePreambleComment(idx){
 }
 function editPreambleLine(idx){
   if(idx < 0 || idx >= katPreamble.length) return;
-  var v = prompt('Edit preamble line:', katPreamble[idx]);
+  var v = prompt(t('prompt.editPreamble'), katPreamble[idx]);
   if(v !== null) katPreamble[idx] = v.trim();
   renderPreamble();
 }
@@ -2602,10 +2875,10 @@ function clearAll(){
   selectedConn = null;
   counter = 0;
   if(chart){ chart.destroy(); chart = null; }
-  document.getElementById('katscript-output').textContent = 'Click "Run" to see KatScript here';
+  document.getElementById('katscript-output').textContent = t('label.katPlaceholder');
   render();
   renderVars();
-  setStatus('Cleared');
+  setStatus(t('status.cleared'));
 }
 
 // ============ Simulation ============
@@ -2676,10 +2949,10 @@ function traceDirection(){
 
 async function run(){
   if(components.length === 0){
-    setStatus('Add components first');
+    setStatus(t('status.addComponentsFirst'));
     return;
   }
-  setStatus('Running...');
+  setStatus(t('status.running'));
 
   const payload = {
     components: components.map(c => ({
@@ -2714,8 +2987,8 @@ async function run(){
     if(data.error){
       dlog('Run error:', data.error, 'katscript:', data.katscript);
       document.getElementById('katscript-output').textContent =
-        (data.katscript ? data.katscript + '\n\n' : '') + 'Error: ' + data.error;
-      setStatus('Error');
+        (data.katscript ? data.katscript + '\n\n' : '') + t('status.error') + ': ' + data.error;
+      setStatus(t('status.error'));
       return;
     }
 
@@ -2732,9 +3005,9 @@ async function run(){
     // Store CCD data for later viewing
     if(data.ccd && Object.keys(data.ccd).length > 0){
       window._lastCCD = data.ccd;
-      setStatus('Done (' + Object.keys(data.ccd).length + ' CCDs)');
+      setStatus(t('status.doneCcd', {n: Object.keys(data.ccd).length}));
     } else {
-      setStatus('Done');
+      setStatus(t('status.done'));
     }
     // Store model for Jupyter window
     localStorage.setItem('optics_model', JSON.stringify({
@@ -2744,7 +3017,7 @@ async function run(){
     }));
   }catch(e){
     document.getElementById('katscript-output').textContent = e.message;
-    setStatus('Error');
+    setStatus(t('status.error'));
   }
 }
 
@@ -2779,24 +3052,24 @@ async function sweep(){
       sweepParams.push({param:p, start:start, stop:stop, steps:steps});
     }
   }
-  if(sweepParams.length === 0){ setStatus('Configure at least one sweep param'); return; }
+  if(sweepParams.length === 0){ setStatus(t('status.configureSweep')); return; }
   var modeEl = document.querySelector('input[name="sweep-mode"]:checked');
   var mode = modeEl ? modeEl.value : 'together';
   if(mode === 'separate' && sweepParams.length > 2){
-    setStatus('Separate mode supports max 2 params'); return;
+    setStatus(t('status.separateMax2')); return;
   }
   var totalSteps = mode === 'together'
     ? (sweepParams.length > 0 ? sweepParams[0].steps : 0)
     : (sweepParams.length > 0 ? sweepParams[0].steps : 0) * (sweepParams.length > 1 ? sweepParams[1].steps : 1);
   var stepEl = document.getElementById('sweep-step');
   stepEl.style.display = 'inline';
-  stepEl.textContent = 'Running...';
-  setStatus('Sweeping... ('+sweepParams.length+' params, '+mode+')');
+  stepEl.textContent = t('status.running');
+  setStatus(t('status.sweeping', {n: sweepParams.length, mode: mode}));
   // Poll progress endpoint
   var progressInterval = setInterval(function(){
     fetch('/api/sweep-progress').then(function(r){return r.json();}).then(function(p){
       if(p.status==='running' && p.total>0){
-        stepEl.textContent = 'Step: '+p.current+' / '+p.total;
+        stepEl.textContent = t('status.step')+': '+p.current+' / '+p.total;
       }
     }).catch(function(){});
   }, 500);
@@ -2835,8 +3108,8 @@ async function sweep(){
 
     if(data.error){
       document.getElementById('katscript-output').textContent =
-        (data.katscript ? data.katscript + '\n\n' : '') + 'Error: ' + data.error;
-      setStatus('Error');
+        (data.katscript ? data.katscript + '\n\n' : '') + t('status.error') + ': ' + data.error;
+      setStatus(t('status.error'));
       stepEl.style.display = 'none';
       return;
     }
@@ -2883,39 +3156,39 @@ async function sweep(){
     }));
     updateJupyterVars();
     clearInterval(progressInterval);
-    setStatus('Sweep done');
-    stepEl.textContent = 'Step: '+totalSteps+' / '+totalSteps;
+    setStatus(t('status.sweepDone'));
+    stepEl.textContent = t('status.step')+': '+totalSteps+' / '+totalSteps;
   } catch(e){
     clearInterval(progressInterval);
-    setStatus('Error: ' + e.message);
+    setStatus(t('status.error') + ': ' + e.message);
   }
 }
 
 function openPropagateDialog(){
   var comps = components.filter(function(c){ return !c.hidden; });
-  if(comps.length < 2){ setStatus('Need at least 2 visible components'); return; }
+  if(comps.length < 2){ setStatus(t('status.needTwoComps')); return; }
   var opts = comps.map(function(c){
-    return '<option value="'+c.id+'">'+c.id+' ('+c.type+')</option>';
+    return '<option value="'+c.id+'">'+c.id+' ('+t('comp.'+c.type)+')</option>';
   }).join('');
   var dlg = document.createElement('div');
   dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999999;display:flex;align-items:center;justify-content:center';
   dlg.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;min-width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.4)">'+
-    '<div style="font-size:14px;font-weight:500;margin-bottom:14px">Beam Propagate</div>'+
+    '<div style="font-size:14px;font-weight:500;margin-bottom:14px">'+t('label.beamPropagate')+'</div>'+
     '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">'+
-      '<span style="font-size:11px;color:var(--muted)">From:</span>'+
+      '<span style="font-size:11px;color:var(--muted)">'+t('label.from')+':</span>'+
       '<select id="prop-from-comp" onchange="updatePropPort(this,true)" style="flex:1;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:11px;border-radius:3px">'+opts+'</select>'+
       '<select id="prop-from-port" style="width:50px;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:11px;border-radius:3px"></select>'+
       '<span style="font-size:10px;color:var(--accent)">.o</span>'+
     '</div>'+
     '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
-      '<span style="font-size:11px;color:var(--muted)">To:</span>'+
+      '<span style="font-size:11px;color:var(--muted)">'+t('label.to')+':</span>'+
       '<select id="prop-to-comp" onchange="updatePropPort(this,false)" style="flex:1;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:11px;border-radius:3px">'+opts+'</select>'+
       '<select id="prop-to-port" style="width:50px;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:11px;border-radius:3px"></select>'+
       '<span style="font-size:10px;color:var(--accent)">.i</span>'+
     '</div>'+
     '<div style="display:flex;gap:6px;justify-content:flex-end">'+
-      '<button onclick="document.body.removeChild(this.parentElement.parentElement.parentElement)" style="font-size:11px;padding:5px 12px">Cancel</button>'+
-      '<button onclick="runPropagate(this)" class="accent" style="font-size:11px;padding:5px 12px">Propagate</button>'+
+      '<button onclick="document.body.removeChild(this.parentElement.parentElement.parentElement)" style="font-size:11px;padding:5px 12px">'+t('btn.cancel')+'</button>'+
+      '<button onclick="runPropagate(this)" class="accent" style="font-size:11px;padding:5px 12px">'+t('btn.propagate')+'</button>'+
     '</div></div>';
   document.body.appendChild(dlg);
   updatePropPort(document.getElementById('prop-from-comp'), true);
@@ -2940,7 +3213,7 @@ async function runPropagate(btn){
   var toPort = document.getElementById('prop-to-port').value;
   var fm = fromComp+'.'+fromPort+'.o', tm = toComp+'.'+toPort+'.i';
   var dlg = btn.parentElement.parentElement.parentElement;
-  dlg.querySelector('.accent').textContent = 'Running...';
+  dlg.querySelector('.accent').textContent = t('status.running');
   dlg.querySelector('.accent').disabled = true;
   try{
     var r = await fetch('/api/trace-path', {
@@ -2949,9 +3222,9 @@ async function runPropagate(btn){
     });
     var data = await r.json();
     document.getElementById('jupyter-code').value = 'print(model.propagate_beam(from_node="'+fm+'", to_node="'+tm+'"))';
-    if(data.error){ setStatus('Propagate error: '+data.error); return; }
-    setStatus('Propagate done');
-  }catch(e){ setStatus('Propagate error: '+e.message); }
+    if(data.error){ setStatus(t('status.propagateError')+': '+data.error); return; }
+    setStatus(t('status.propagateDone'));
+  }catch(e){ setStatus(t('status.propagateError')+': '+e.message); }
   finally{ if(dlg.parentElement) document.body.removeChild(dlg); }
 }
 
@@ -3157,7 +3430,7 @@ window.addEventListener('resize', function(){ setTimeout(resizeCharts, 100); });
 // Popup dual-plot for amp detector (magnitude + phase)
 function showAmpPopup(xVals, magData, phaseData){
   var win = window.open('', 'ampPlot', 'width=700,height=500,scrollbars=yes');
-  if(!win){ setStatus('Popup blocked! Allow popups for this site.'); return; }
+  if(!win){ setStatus(t('status.popupBlocked')); return; }
   var xStr = JSON.stringify(xVals), magStr = JSON.stringify(magData);
   var phaseStr = phaseData ? JSON.stringify(phaseData) : 'null';
   var hasPhase = phaseData ? 'true' : 'false';
@@ -3199,14 +3472,14 @@ function switchTab(tab){
 // Copy generated KatScript to clipboard
 function copyKatScript(){
   var el = document.getElementById('katscript-output');
-  if(!el || !el.textContent || el.textContent === 'Click "Run" to see KatScript here'){ setStatus('Nothing to copy'); return; }
-  navigator.clipboard.writeText(el.textContent).then(function(){ setStatus('KatScript copied'); });
+  if(!el || !el.textContent || el.textContent === t('label.katPlaceholder')){ setStatus(t('status.nothingToCopy')); return; }
+  navigator.clipboard.writeText(el.textContent).then(function(){ setStatus(t('status.katCopied')); });
 }
 
 // Export KatScript as .kat file download
 function exportKatScript(){
   var el = document.getElementById('katscript-output');
-  if(!el || !el.textContent || el.textContent === 'Click "Run" to see KatScript here'){ setStatus('Nothing to export'); return; }
+  if(!el || !el.textContent || el.textContent === t('label.katPlaceholder')){ setStatus(t('status.nothingToExport')); return; }
   // Add rename comment header if rename_map exists
   var renameMap = window._renameMap || {};
   var renameKeys = Object.keys(renameMap);
@@ -3230,7 +3503,7 @@ function exportKatScript(){
   a.download = 'model.kat';
   a.click();
   URL.revokeObjectURL(a.href);
-  setStatus('Exported model.kat');
+  setStatus(t('status.exportedKat'));
 }
 
 function showCCD(ccdName){
@@ -3242,7 +3515,7 @@ function showCCD(ccdName){
       ccdData = {image: 'data:image/png;base64,' + sa.frames_png[0]};
     }
   }
-  if(!ccdData){ setStatus('No CCD data. Run simulation first.'); return; }
+  if(!ccdData){ setStatus(t('status.noCcdData')); return; }
   if(ccdData.image){
     const w = window.open('', 'ccd_' + ccdName, 'width=600,height=600');
     var imgSrc = ccdData.image.indexOf('data:') === 0 ? ccdData.image : 'data:image/png;base64,' + ccdData.image;
@@ -3251,7 +3524,7 @@ function showCCD(ccdName){
     return;
   }
   const I = ccdData.intensity;
-  if(!I){ setStatus('No CCD intensity data'); return; }
+  if(!I){ setStatus(t('status.noCcdIntensity')); return; }
   const ny = I.length, nx = I[0] ? I[0].length : 0;
   let maxV = 0;
   for(let j=0;j<ny;j++) for(let i=0;i<nx;i++) if(I[j][i] > maxV) maxV = I[j][i];
@@ -3350,7 +3623,7 @@ function exportPython(){
     ]
   };
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(nb,null,2)],{type:'application/x-ipynb+json'}));a.download='model.ipynb';a.click();
-  setStatus('Exported model.ipynb');
+  setStatus(t('status.exportedIpynb'));
 }
 
 // Enhanced import: handles POS data if present
@@ -3478,18 +3751,18 @@ function resolvePyVars(text){
     dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999999;display:flex;align-items:center;justify-content:center';
     var box = document.createElement('div');
     box.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;min-width:300px;max-width:450px;box-shadow:0 8px 30px rgba(0,0,0,0.4)';
-    box.innerHTML = '<div style="font-size:14px;font-weight:500;margin-bottom:12px">Undefined Variables</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Enter values for the following variables:</div>';
+    box.innerHTML = '<div style="font-size:14px;font-weight:500;margin-bottom:12px">'+t('label.undefinedVars')+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">'+t('label.enterVarValues')+'</div>';
     var inputs = {};
     for(var ui=0;ui<undefNames.length;ui++){
       var n = undefNames[ui];
       var row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px';
-      row.innerHTML = '<label style="font-size:12px;min-width:80px;font-weight:500">' + n + '</label><input class="var-input-' + ui + '" type="text" style="flex:1;padding:6px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;font-family:Consolas,monospace" placeholder="value">';
+      row.innerHTML = '<label style="font-size:12px;min-width:80px;font-weight:500">' + n + '</label><input class="var-input-' + ui + '" type="text" style="flex:1;padding:6px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;font-family:Consolas,monospace" placeholder="'+t('label.value')+'">';
       box.appendChild(row);
     }
     var btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:14px';
-    btnRow.innerHTML = '<button id="var-cancel-btn" style="padding:6px 14px;font-size:11px;background:#444;border:1px solid #555;color:#e0e0e0;border-radius:4px;cursor:pointer">Cancel</button><button id="var-ok-btn" style="padding:6px 14px;font-size:11px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer">OK</button>';
+    btnRow.innerHTML = '<button id="var-cancel-btn" style="padding:6px 14px;font-size:11px;background:#444;border:1px solid #555;color:#e0e0e0;border-radius:4px;cursor:pointer">'+t('btn.cancel')+'</button><button id="var-ok-btn" style="padding:6px 14px;font-size:11px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer">'+t('btn.ok')+'</button>';
     box.appendChild(btnRow);
     dlg.appendChild(box);
     document.body.appendChild(dlg);
@@ -3529,7 +3802,7 @@ async function importModel(){
   clearAll();
   var ta = document.getElementById('kat-import');
   var text = (ta.value || '').trim();
-  if(!text){ setStatus('No KatScript to import'); return; }
+  if(!text){ setStatus(t('status.noKatToImport')); return; }
   // Save original text for expression detection
   var rawText = text;
   // If text contains Python imports or numpy, evaluate vars on the backend
@@ -3797,7 +4070,7 @@ async function importModel(){
   // END: show imported vars count for debug
   dlog('[IMPORT] globalVars:', globalVars.length, 'entries:', globalVars.slice(-5).map(function(g){return g.name+'='+g.value;}));
   dlog('[IMPORT] katPreamble:', katPreamble.length, 'entries:', katPreamble.slice(0,3));
-  setStatus('Imported ' + newComps.length + ' components');
+  setStatus(t('status.imported', {n: newComps.length}));
 }
 
 // BFS positioning with BS auto-rotation: process in laser→downstream order
@@ -4669,10 +4942,10 @@ async function importFull(){
         render();
         for(var i=0;i<connections.length;i++){ connections[i].fixed = true; connections[i].angleLocked = true; }
         updateLockButtons();
-        setStatus('Restored ' + components.length + ' components');
+        setStatus(t('status.restored', {n: components.length}));
         return;
       }
-    } catch(e){ setStatus('POS parse error: ' + e.message); return; }
+    } catch(e){ setStatus(t('status.posParseError') + ': ' + e.message); return; }
   }
   // Fallback: KatScript-only import
   await importModel();
@@ -4690,7 +4963,7 @@ function loadTutorial(){
   render();
   for(var i=0;i<connections.length;i++){ connections[i].fixed = true; connections[i].angleLocked = true; }
   updateLockButtons();
-  setStatus('Tutorial loaded (all locked)');
+  setStatus(t('status.tutorialLoaded'));
 }
 // Store tutorial KAT in localStorage for example system
 try{
@@ -4782,7 +5055,7 @@ function openIconPanel(){
   var refreshBtn = el('button', {style:'font-size:10px;padding:4px 12px'}, 'Refresh');
   refreshBtn.onclick = function(){ loadIcons().then(function(){ var m = document.getElementById('icon-panel-mask'); if(m) m.remove(); openIconPanel(); }); };
   bar.appendChild(refreshBtn);
-  var closeBtn = el('button', {style:'font-size:10px;padding:4px 12px;margin-left:auto'}, 'Close');
+  var closeBtn = el('button', {style:'font-size:10px;padding:4px 12px;margin-left:auto'}, t('btn.close'));
   closeBtn.onclick = function(){ var m = document.getElementById('icon-panel-mask'); if(m) m.remove(); render(); };
   bar.appendChild(closeBtn);
   dlg.appendChild(bar);
@@ -4793,7 +5066,7 @@ function openIconPanel(){
 
 function askCompForIcon(file){
   var types = ['laser','mirror','beamsplitter','lens','modulator','isolator','photodetector','ccd','gauss','cavity'];
-  var type = prompt('Assign to which type?\n' + types.join(', '), types[0]);
+  var type = prompt(t('prompt.assignType')+'\n' + types.join(', '), types[0]);
   if(type && types.indexOf(type.toLowerCase()) >= 0){
     type = type.toLowerCase();
     loadIconFile(file, type);
@@ -4804,7 +5077,7 @@ function loadIconFile(file, key){
   var reader = new FileReader();
   reader.onload = function(){
     svgIcons[key] = reader.result;
-    setStatus('Icon assigned to ' + key);
+    setStatus(t('status.iconAssigned', {key: key}));
     var m = document.getElementById('icon-panel-mask'); if(m) m.remove();
     openIconPanel(); render();
   };
@@ -4839,8 +5112,8 @@ function handleIconFile(input){
 
 function reloadIcon(type){
   fetch('/api/svg/' + type).then(r => r.ok ? r.text() : null).then(txt => {
-    if(txt){ svgIcons[type] = txt; setStatus('Loaded SVG: ' + type); }
-    else { delete svgIcons[type]; setStatus('No SVG for: ' + type); }
+    if(txt){ svgIcons[type] = txt; setStatus(t('status.loadedSvg', {type: type})); }
+    else { delete svgIcons[type]; setStatus(t('status.noSvg', {type: type})); }
     openIconPanel();
     render();
   });

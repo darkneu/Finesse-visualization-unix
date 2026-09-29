@@ -287,7 +287,7 @@ window.toggleLang = function(){
   --accent:#e94560;--text:#1a1a2e;--muted:#6b7280;
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-header{background:var(--card);padding:10px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;white-space:nowrap}
+header{background:var(--card);padding:10px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;row-gap:6px}
 h1{font-size:16px;color:var(--accent)}
 button{padding:6px 14px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:4px;cursor:pointer;font-size:12px;transition:background .15s}
 button:hover{background:var(--border)}
@@ -405,6 +405,7 @@ button.accent:hover{filter:brightness(1.15)}
 
 <header id="main-header">
   <h1 data-i18n="app.title">Optics Simulator</h1>
+  <button onclick="toggleLang()" style="font-size:11px;padding:3px 10px;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:transparent" title="Switch language / 切换语言" data-i18n-title="title.language"><span id="lang-label">EN</span></button>
   <button class="accent" onclick="run()" data-i18n="btn.run">Run</button>
   <button onclick="toggleSweepPanel()" data-i18n="btn.sweep">Sweep</button>
   <button onclick="clearAll()" data-i18n="btn.clear">Clear</button>
@@ -460,7 +461,6 @@ button.accent:hover{filter:brightness(1.15)}
   </label>
   <span class="status" id="status" data-i18n="status.ready">Ready</span>
   <span id="sweep-step" style="display:none;font-size:11px;color:var(--accent);margin-left:8px;min-width:80px;text-align:right"></span>
-  <button onclick="toggleLang()" style="font-size:10px;padding:3px 8px" title="Switch language / 切换语言" data-i18n-title="title.language"><span id="lang-label">EN</span></button>
   <button onclick="toggleTheme()" style="font-size:10px;padding:3px 8px" title="Light/Dark mode" data-i18n-title="title.lightDark">🌓</button>
 </header>
 

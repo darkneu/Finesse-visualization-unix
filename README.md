@@ -77,6 +77,9 @@ If port 5000 is in use, the next available port is selected automatically.
 
 Full documentation: [USER_MANUAL.pdf](USER_MANUAL.pdf) (3 Michelson interferometer examples included).
 
+**Step-by-step guide (bilingual):** [USER_GUIDE.md](USER_GUIDE.md) — how to connect components, set up a Gaussian beam, and build an optical cavity.
+**分步操作指南（中英双语）：** [USER_GUIDE.md](USER_GUIDE.md) — 如何连接各元件、设置高斯光束、搭建光学腔。
+
 ---
 
 ## Language / 语言
